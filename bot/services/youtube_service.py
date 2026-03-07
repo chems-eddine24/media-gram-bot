@@ -1,23 +1,21 @@
 import os
 import asyncio
-from pathlib import Path
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError, ExtractorError
 from config import settings
+DOWNLOADS_DIR = settings.DOWNLOADS_DIR
 
 
+def _ensure_downloads_dir() -> None:
+    DOWNLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def _ensure_dir() -> None:
-    settings.DOWNLOADS_DIR.mkdir(parents=True, exist_ok=True)
-
-
-def _audio_sync(url: str) -> str:
-    _ensure_dir()
+def _download_audio_sync(url: str) -> str:
+    _ensure_downloads_dir()
 
     ydl_opts = {
         "format": "bestaudio/best",
-        "outtmpl": str(settings.DOWNLOADS_DIR / "%(title)s.%(ext)s"),
+        "outtmpl": str(DOWNLOADS_DIR / "%(title)s.%(ext)s"),
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
             "preferredcodec": "mp3",
@@ -33,12 +31,17 @@ def _audio_sync(url: str) -> str:
         return os.path.splitext(filename)[0] + ".mp3"
 
 
-def _video_sync(url: str, quality: str = "720") -> str:
-    _ensure_dir()
+def _download_video_sync(url: str, quality: str = "best") -> str:
+    _ensure_downloads_dir()
+
+    format_str = f"bestvideo[height<={quality}]+bestaudio/best" if quality != "best" else "bestvideo+bestaudio/best"
 
     ydl_opts = {
-        "format": f"bestvideo[height<={quality}]+bestaudio/best[height<={quality}]",
-        "outtmpl": str(settings.DOWNLOADS_DIR / "%(title)s.%(ext)s"),
+        "format": format_str,
+        "outtmpl": str(DOWNLOADS_DIR / "%(title)s.%(ext)s"),
+        "postprocessors": [{
+            "key": "FFmpegMerger",
+        }],
         "merge_output_format": "mp4",
         "quiet": True,
         "no_warnings": True,
@@ -46,22 +49,26 @@ def _video_sync(url: str, quality: str = "720") -> str:
 
     with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)
-        filename = ydl.prepare_filename(info)
-        base = os.path.splitext(filename)[0]
-        return base + ".mp4"
+        return ydl.prepare_filename(info)
 
 
-async def download_audio(url: str) -> str:
+async def download_youtube_audio(url: str) -> str:
     try:
-        loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(None, _audio_sync, url)
-    except (DownloadError, ExtractorError) as e:
-        raise ValueError(f"Download failed: {e}") from e
+        return await asyncio.get_event_loop().run_in_executor(
+            None, _download_audio_sync, url
+        )
+    except DownloadError as e:
+        raise ValueError(f"Could not download audio: {e}") from e
+    except ExtractorError as e:
+        raise ValueError(f"Could not extract info from URL: {e}") from e
 
 
-async def download_video(url: str, quality: str = "720") -> str:
+async def download_youtube_video(url: str, quality: str = "best") -> str:
     try:
-        loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(None, _video_sync, url, quality)
-    except (DownloadError, ExtractorError) as e:
-        raise ValueError(f"Download failed: {e}") from e
+        return await asyncio.get_event_loop().run_in_executor(
+            None, _download_video_sync, url, quality
+        )
+    except DownloadError as e:
+        raise ValueError(f"Could not download video: {e}") from e
+    except ExtractorError as e:
+        raise ValueError(f"Could not extract info from URL: {e}") from e
