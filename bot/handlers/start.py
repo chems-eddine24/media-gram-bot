@@ -2,9 +2,9 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 START_TEXT = """
-👋 *Welcome to YTGram Bot\!*
+👋 *Welcome to YTGram Bot*
 
-I can download YouTube videos and audio directly to your Telegram chat\.
+I can download YouTube videos and audio directly to your Telegram chat
 
 *📥 What I can do:*
 • `/audio <url>` — Download as MP3
@@ -12,22 +12,20 @@ I can download YouTube videos and audio directly to your Telegram chat\.
 • `/start` — Show this menu
 • `/help` — How to use the bot
 
-*⚡ Quick example:*
-`/audio https://youtube\.com/watch?v=\.\.\.`
 
-_Just paste any YouTube URL and I'll ask what format you want\._
+_Just paste any YouTube URL and I'll do the rest!_ 🎯
 """
 
 HELP_TEXT = """
 *📖 How to use YTGram Bot:*
 
-*Download Audio \(MP3\):*
+*Download Audio (MP3):*
 `/audio https://youtube\.com/watch?v=xxxxx`
 
 *Download Video \(MP4\):*
 `/video https://youtube\.com/watch?v=xxxxx`
 
-*Or just paste a YouTube URL* and pick a format from the buttons\.
+*Or just paste a YouTube URL* and pick a format from the buttons
 
 *Supported URLs:*
 • Standard YouTube links
@@ -43,7 +41,7 @@ HELP_TEXT = """
 async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     await update.message.reply_text(
-        f"*Welcome, {user.first_name}\!*\n" + START_TEXT,
+        f"*Welcome, {user.first_name}*\n" + START_TEXT,
         parse_mode="MarkdownV2"
     )
 
