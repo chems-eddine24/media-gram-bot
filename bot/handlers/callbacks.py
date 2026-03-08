@@ -14,8 +14,12 @@ async def format_choice_callback(update: Update, context: ContextTypes.DEFAULT_T
     query = update.callback_query
     await query.answer()
 
-    data = query.data
-    action, url = data.split(":", 1)
+    action, url_id = query.data.split(":", 1)
+    url = context.user_data.get(url_id)
+
+    if not url:
+        await query.edit_message_text("Session expired. Please send the URL again.")
+        return
 
     msg = await query.edit_message_text("Downloading...")
 
@@ -49,8 +53,12 @@ async def quality_choice_callback(update: Update, context: ContextTypes.DEFAULT_
     query = update.callback_query
     await query.answer()
 
-    data = query.data
-    _, quality, url = data.split(":", 2)
+    _, quality, url_id = query.data.split(":", 2)
+    url = context.user_data.get(url_id)
+
+    if not url:
+        await query.edit_message_text("Session expired. Please send the URL again.")
+        return
 
     await query.edit_message_text(f"Downloading {quality}p video...")
 
