@@ -2,46 +2,45 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 START_TEXT = """
-👋 *Welcome to YTGram Bot*
+👋 *Welcome to MediaGram Bot*
 
-I can download YouTube videos and audio directly to your Telegram chat
+I can download videos and audio from multiple platforms directly to your Telegram chat
 
-*📥 What I can do:*
-• `/audio <url>` — Download as MP3
-• `/video <url>` — Download as MP4
+*📥 Supported Platforms:*
+• ▶️ YouTube
+• 🎵 TikTok
+• 📸 Instagram
+• 📘 Facebook
+
+*⚡ How to use:*
+Just paste any supported URL and I'll do the rest
+
+*📋 Commands:*
 • `/start` — Show this menu
 • `/help` — How to use the bot
-
-
-_Just paste any YouTube URL and I'll do the rest!_ 🎯
 """
 
 HELP_TEXT = """
-*📖 How to use YTGram Bot:*
+*How to use MediaGram Bot:*
 
-*Download Audio (MP3):*
-`/audio https://youtube\.com/watch?v=xxxxx`
-
-*Download Video \(MP4\):*
-`/video https://youtube\.com/watch?v=xxxxx`
-
-*Or just paste a YouTube URL* and pick a format from the buttons
-
-*Supported URLs:*
-• Standard YouTube links
-• YouTube Shorts
-• youtu\.be short links
+*Step 1:* Paste a link from YouTube, TikTok, Instagram or Facebook
+*Step 2:* Pick your format from the buttons:
+  • 🎵 Audio MP3
+  • 🎬 Video MP4
+  • 🎬 360p  720p  1080p
 
 *⚠️ Limitations:*
-• Max video length: 60 minutes
 • Files over 50MB can't be sent via Telegram
+• Instagram: public posts only
+• Facebook: public videos only
+• TikTok: no watermark when possible
 """
 
 
 async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     await update.message.reply_text(
-        f"*Welcome, {user.first_name}*\n" + START_TEXT,
+        f"👋 *Welcome, {user.first_name}*\n" + START_TEXT,
         parse_mode="MarkdownV2"
     )
 
