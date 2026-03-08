@@ -6,7 +6,6 @@ from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError, ExtractorError
 
 DOWNLOADS_DIR = Path("downloads")
-
 PLATFORM_PATTERNS = {
     "youtube": re.compile(r"(https?://)?(www\.)?(youtube\.com/watch\?v=|youtu\.be/|youtube\.com/shorts/)[\w\-]+"),
     "tiktok": re.compile(r"(https?://)?(www\.|vm\.)?tiktok\.com/[\w\-/@]+"),
